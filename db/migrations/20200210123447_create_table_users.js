@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-  knex.schema.createTable("users", usersTable => {
+  return knex.schema.createTable("users", usersTable => {
     usersTable.string("username").primary();
     usersTable.string("avatar_url").notNullable();
     usersTable.string("name");
@@ -7,5 +7,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  knex.schema.dropTable("users");
+  return knex.schema.dropTable("users");
 };

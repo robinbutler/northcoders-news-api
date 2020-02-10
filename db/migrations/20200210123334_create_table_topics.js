@@ -1,10 +1,10 @@
 exports.up = function(knex) {
-  knex.schema.createTable("topics", topicsTable => {
-    topicsTable.string("slug").primary();
+  return knex.schema.createTable("topics", topicsTable => {
     topicsTable.string("description").notNullable();
+    topicsTable.string("slug").primary();
   });
 };
 
 exports.down = function(knex) {
-  knex.schema.dropTable("topics");
+  return knex.schema.dropTable("topics");
 };

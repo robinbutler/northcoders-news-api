@@ -1,14 +1,8 @@
 exports.up = function(knex) {
-  knex.schema.createTable("articles", articleTable => {
+  return knex.schema.createTable("articles", articleTable => {
     articleTable.increments("article_id").primary();
-    articleTable
-      .string("title")
-      .notNullable()
-      .defaultTo("Title Pending");
-    articleTable
-      .body("body")
-      .notNullable()
-      .defaultTo("Content Here");
+    articleTable.string("title").notNullable();
+    articleTable.text("body").notNullable();
     articleTable.integer("votes").defaultTo(0);
     articleTable
       .string("topic")
@@ -23,5 +17,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  knex.schema.dropTable("articles");
+  return knex.schema.dropTable("articles");
 };
