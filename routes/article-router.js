@@ -2,7 +2,8 @@ const express = require("express");
 const articleRouter = express.Router();
 const {
   patchArticle,
-  getArticle
+  getArticleById,
+  getArticles
 } = require("../controllers/article-controllers");
 const {
   postComment,
@@ -11,8 +12,13 @@ const {
 const handle405errors = require("../errors/405s");
 
 articleRouter
+  .route("/")
+  .get(getArticles)
+  .all(handle405errors);
+
+articleRouter
   .route("/:id")
-  .get(getArticle)
+  .get(getArticleById)
   .patch(patchArticle)
   .all(handle405errors);
 

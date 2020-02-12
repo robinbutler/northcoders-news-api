@@ -87,8 +87,46 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
+    it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+      const invalidMethods = ["patch", "delete", "post"];
+      const promiseArray = invalidMethods.map(method => {
+        return request(app)
+          [method]("/api/articles/")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Invalid method");
+          });
+      });
+      return Promise.all(promiseArray);
+    });
     describe("GET", () => {
-      it("status 200, returns array of all article with default sorting");
+      it("status 200, returns array of all article with default sorting", () => {
+        return request(app)
+          .get("/api/articles/")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(12);
+            expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
+      it("status 200, returns array of all article with author sorting", () => {
+        return request(app)
+          .get("/api/articles/?author=butter_bridge")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(3);
+            expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
+      it("status 200, returns array of all article with topic sorting", () => {
+        return request(app)
+          .get("/api/articles/?topic=mitch")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(11);
+            expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
     });
     describe("/:id", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {

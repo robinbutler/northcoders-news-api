@@ -1,7 +1,19 @@
 const query = require("../db/connection");
-const { getCommentCount } = require("./comments-models");
 
-const fetchArticle = id => {
+const fetchArticles = ({ sort_by, order, author, topic }) => {
+  return query("articles")
+    .select("*")
+    .modify(query => {
+      if (author) query.where({ author });
+      if (topic) query.where({ topic });
+    })
+    .orderBy(sort_by || "created_at", order || "desc")
+    .then(articles => {
+      return articles;
+    });
+};
+
+const fetchArticleById = id => {
   return query("articles")
     .select("articles.*")
     .where({ "articles.article_id": id })
@@ -30,4 +42,4 @@ const updateArticle = (id, newVotes) => {
     });
 };
 
-module.exports = { fetchArticle, updateArticle };
+module.exports = { fetchArticles, fetchArticleById, updateArticle };

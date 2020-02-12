@@ -1,8 +1,21 @@
-const { fetchArticle, updateArticle } = require("../models/articles-models");
+const {
+  fetchArticles,
+  fetchArticleById,
+  updateArticle
+} = require("../models/articles-models");
 
-const getArticle = (req, res, next) => {
+const getArticles = (req, res, next) => {
+  userQuery = req.query;
+  fetchArticles(userQuery)
+    .then(articles => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
+};
+
+const getArticleById = (req, res, next) => {
   id = req.params["id"];
-  fetchArticle(id)
+  fetchArticleById(id)
     .then(article => {
       res.status(200).send({ article });
     })
@@ -19,4 +32,4 @@ const patchArticle = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getArticle, patchArticle };
+module.exports = { getArticleById, patchArticle, getArticles };
