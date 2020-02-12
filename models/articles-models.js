@@ -1,5 +1,5 @@
 const query = require("../db/connection");
-const getCommentCount = require("./comments-models");
+const { getCommentCount } = require("./comments-models");
 
 const fetchArticle = id => {
   return query
@@ -23,4 +23,18 @@ const fetchArticle = id => {
     });
 };
 
-module.exports = fetchArticle;
+const updateArticle = (id, newVotes) => {
+  return query("articles")
+    .increment("votes", newVotes)
+    .returning("*")
+    .where({ article_id: `${id}` })
+    .then(async article => {
+      if (article.length === 0)
+        return Promise.reject({ status: 404, msg: "User not found" });
+      const count = await getCommentCount(id);
+      article[0].comment_count = count;
+      return article[0];
+    });
+};
+
+module.exports = { fetchArticle, updateArticle };

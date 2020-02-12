@@ -26,6 +26,18 @@ describe("/api", () => {
       });
   });
   describe("/topics", () => {
+    it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+      const invalidMethods = ["patch", "post", "delete"];
+      const promiseArray = invalidMethods.map(method => {
+        return request(app)
+          [method]("/api/topics")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Invalid method");
+          });
+      });
+      return Promise.all(promiseArray);
+    });
     describe("GET", () => {
       it("200 responds with a named array of topic objects, each topic having correct properties", () => {
         return request(app)
@@ -40,11 +52,15 @@ describe("/api", () => {
             expect(response.body.topics.length).to.equal(3);
           });
       });
+    });
+  });
+  describe("users", () => {
+    describe("/:username", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-        const invalidMethods = ["patch", "post", "delete"];
+        const invalidMethods = ["delete", "post", "put"];
         const promiseArray = invalidMethods.map(method => {
           return request(app)
-            [method]("/api/topics")
+            [method]("/api/users/butter_bridge")
             .expect(405)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("Invalid method");
@@ -52,10 +68,6 @@ describe("/api", () => {
         });
         return Promise.all(promiseArray);
       });
-    });
-  });
-  describe("users", () => {
-    describe("/:username", () => {
       describe("GET", () => {
         it("200 responds with correct status code and individual user", () => {
           return request(app)
@@ -84,6 +96,18 @@ describe("/api", () => {
   });
   describe("/articles", () => {
     describe("/:id", () => {
+      it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+        const invalidMethods = ["delete", "post"];
+        const promiseArray = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles/1")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Invalid method");
+            });
+        });
+        return Promise.all(promiseArray);
+      });
       describe("GET", () => {
         it("200 responds with correct status code and individual user", () => {
           return request(app)
@@ -113,21 +137,9 @@ describe("/api", () => {
               expect(response.body.msg).to.equal("User not found");
             });
         });
-        it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-          const invalidMethods = ["delete", "post"];
-          const promiseArray = invalidMethods.map(method => {
-            return request(app)
-              [method]("/api/articles/1")
-              .expect(405)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal("Invalid method");
-              });
-          });
-          return Promise.all(promiseArray);
-        });
       });
       describe("PATCH", () => {
-        it("200 responds with correct status code and the updated article", () => {
+        it("201 responds with correct status code and the updated article", () => {
           return request(app)
             .patch("/api/articles/5")
             .send({ inc_votes: 5 })
@@ -135,6 +147,58 @@ describe("/api", () => {
             .then(response => {
               expect(response.body.article.votes).to.equal(5);
             });
+        });
+        it("ERROR 400 - correct path bad request", () => {
+          return request(app)
+            .patch("/api/articles/not_an_id")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Bad Request");
+            });
+        });
+        it("ERROR 404 - correct path with non existent id", () => {
+          return request(app)
+            .patch("/api/articles/400")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("User not found");
+            });
+        });
+      });
+      describe("/comments", () => {
+        describe("POST", () => {
+          it("201 responds with correct status code and the updated article", () => {
+            return request(app)
+              .post("/api/articles/5/comments")
+              .send({ username: "robin", body: "hello there" })
+              .expect(201)
+              .then(response => {
+                expect(response.body.comment).to.contain.keys(
+                  "username",
+                  "body"
+                );
+              });
+          });
+          it("ERROR 400 - correct path bad request", () => {
+            return request(app)
+              .post("/api/articles/not_an_id/comments")
+              .send({ username: "robin", body: "hello there" })
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Bad Request");
+              });
+          });
+          it("ERROR 404 - correct path with non existent id", () => {
+            return request(app)
+              .patch("/api/articles/400/comments")
+              .send({ username: "robin", body: "hello there" })
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.equal("Article not found");
+              });
+          });
         });
       });
     });

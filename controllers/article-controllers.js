@@ -1,4 +1,4 @@
-const fetchArticle = require("../models/articles-models");
+const { fetchArticle, updateArticle } = require("../models/articles-models");
 
 const getArticle = (req, res, next) => {
   id = req.params["id"];
@@ -14,7 +14,7 @@ const getArticle = (req, res, next) => {
 const patchArticle = (req, res, next) => {
   newVote = req.body.inc_votes;
   id = req.params.id;
-  changeVotes(id, newVote)
+  updateArticle(id, newVote)
     .then(article => {
       res.status(201).send({ article });
     })
