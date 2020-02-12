@@ -1,14 +1,5 @@
 const query = require("../db/connection");
 
-const getCommentCount = article_id => {
-  return query("comments")
-    .count("comment_id")
-    .where({ article_id: `${article_id}` })
-    .then(count => {
-      return count[0].count;
-    });
-};
-
 const addComment = (article_id, comment) => {
   comment.article_id = parseInt(article_id.id);
   comment.author = comment["username"];
@@ -21,4 +12,14 @@ const addComment = (article_id, comment) => {
     });
 };
 
-module.exports = { getCommentCount, addComment };
+const fetchComments = ({ id }, { sort_by, order }) => {
+  return query("comments")
+    .select("*")
+    .where({ article_id: id })
+    .orderBy(sort_by || "created_at", order || "desc")
+    .then(comments => {
+      return comments;
+    });
+};
+
+module.exports = { addComment, fetchComments };

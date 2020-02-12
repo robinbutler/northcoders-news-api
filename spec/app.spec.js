@@ -83,18 +83,13 @@ describe("/api", () => {
               expect(response.body.user.username).to.equal("butter_bridge");
             });
         });
-        it("ERROR 404 - correct path with incorrect username", () => {
-          return request(app)
-            .get("/api/users/1")
-            .expect(404)
-            .then(response => {
-              expect(response.body.msg).to.equal("User not found");
-            });
-        });
       });
     });
   });
   describe("/articles", () => {
+    describe("GET", () => {
+      it("status 200, returns array of all article with default sorting");
+    });
     describe("/:id", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
         const invalidMethods = ["delete", "post"];
@@ -134,7 +129,9 @@ describe("/api", () => {
             .get("/api/articles/400")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal("User not found");
+              expect(response.body.msg).to.equal(
+                "Correct path, selection not found"
+              );
             });
         });
       });
@@ -163,21 +160,39 @@ describe("/api", () => {
             .send({ inc_votes: 5 })
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal("User not found");
+              expect(response.body.msg).to.equal(
+                "Correct path, selection not found"
+              );
             });
         });
       });
       describe("/comments", () => {
+        it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+          const invalidMethods = ["put", "delete"];
+          const promiseArray = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/articles/1/comments")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Invalid method");
+              });
+          });
+          return Promise.all(promiseArray);
+        });
         describe("POST", () => {
           it("201 responds with correct status code and the updated article", () => {
             return request(app)
-              .post("/api/articles/5/comments")
-              .send({ username: "robin", body: "hello there" })
+              .post("/api/articles/1/comments")
+              .send({ username: "butter_bridge", body: "hello there" })
               .expect(201)
               .then(response => {
-                expect(response.body.comment).to.contain.keys(
-                  "username",
-                  "body"
+                expect(response.body.addedComment).to.contain.keys(
+                  "author",
+                  "body",
+                  "comment_id",
+                  "article_id",
+                  "votes",
+                  "created_at"
                 );
               });
           });
@@ -190,13 +205,46 @@ describe("/api", () => {
                 expect(response.body.msg).to.equal("Bad Request");
               });
           });
-          it("ERROR 404 - correct path with non existent id", () => {
+          it("ERROR 404/422 - correct path with non existent id", () => {
             return request(app)
-              .patch("/api/articles/400/comments")
+              .post("/api/articles/1/comments")
               .send({ username: "robin", body: "hello there" })
-              .expect(404)
+              .expect(422)
               .then(response => {
-                expect(response.body.msg).to.equal("Article not found");
+                expect(response.body.msg).to.equal("Unprocessable input");
+              });
+          });
+        });
+        describe("GET", () => {
+          it("responds with a 200 status code and retrieved comments, sorted with created_at desc DEFAULT", () => {
+            return request(app)
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.have.length(13);
+                expect(response.body.comments).to.be.sortedBy("created_at", {
+                  descending: true
+                });
+              });
+          });
+          it("responds with a 200 status code and retrieved comments, user choice of sorting", () => {
+            return request(app)
+              .get("/api/articles/5/comments?sort_by=votes&order=asc")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.have.length(2);
+                expect(response.body.comments).to.be.sortedBy("votes", {
+                  descending: false
+                });
+              });
+          });
+          it("ERROR 400 - correct path bad request", () => {
+            return request(app)
+              .get("/api/articles/not_an_id/comments")
+              .send({ username: "robin", body: "hello there" })
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Bad Request");
               });
           });
         });

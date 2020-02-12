@@ -6,9 +6,7 @@ const getArticle = (req, res, next) => {
     .then(article => {
       res.status(200).send({ article });
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const patchArticle = (req, res, next) => {
@@ -18,9 +16,7 @@ const patchArticle = (req, res, next) => {
     .then(article => {
       res.status(201).send({ article });
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = { getArticle, patchArticle };
