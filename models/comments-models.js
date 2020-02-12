@@ -22,4 +22,32 @@ const fetchComments = ({ id }, { sort_by, order }) => {
     });
 };
 
-module.exports = { addComment, fetchComments };
+const updateCommentVotes = ({ comment_id }, { inc_votes }) => {
+  return query("comments")
+    .increment("votes", inc_votes)
+    .returning("*")
+    .where({ comment_id: comment_id })
+    .then(comment => {
+      if (comment.length === 0)
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+      return comment[0];
+    });
+};
+
+const removeComment = ({ comment_id }) => {
+  return query("comments")
+    .where({ comment_id: comment_id })
+    .del()
+    .then(deleteCount => {
+      if (deleteCount === 0)
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+      return deleteCount[0];
+    });
+};
+
+module.exports = {
+  addComment,
+  fetchComments,
+  updateCommentVotes,
+  removeComment
+};

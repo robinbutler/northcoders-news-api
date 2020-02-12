@@ -167,9 +167,7 @@ describe("/api", () => {
             .get("/api/articles/400")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal(
-                "Correct path, selection not found"
-              );
+              expect(response.body.msg).to.equal("User not found");
             });
         });
       });
@@ -198,9 +196,7 @@ describe("/api", () => {
             .send({ inc_votes: 5 })
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal(
-                "Correct path, selection not found"
-              );
+              expect(response.body.msg).to.equal("User not found");
             });
         });
       });
@@ -285,6 +281,71 @@ describe("/api", () => {
                 expect(response.body.msg).to.equal("Bad Request");
               });
           });
+        });
+      });
+    });
+  });
+  describe("/comments", () => {
+    describe("/:comment_id", () => {
+      it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+        const invalidMethods = ["get", "post"];
+        const promiseArray = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/comments/1")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Invalid method");
+            });
+        });
+        return Promise.all(promiseArray);
+      });
+      describe("PATCH", () => {
+        it("status 201, returning updated comment", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: -5 })
+            .expect(201)
+            .then(({ body: { comment } }) => {
+              expect(comment.votes).to.equal(11);
+              expect(comment).to.contain.keys(
+                "comment_id",
+                "author",
+                "article_id",
+                "votes",
+                "created_at",
+                "body"
+              );
+            });
+        });
+        it("ERROR 400 missing / incorrect data", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: "bread" })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Bad Request");
+            });
+        });
+        it("ERROR 404 correct data for missing comment", () => {
+          return request(app)
+            .patch("/api/comments/100000")
+            .send({ inc_votes: "5" })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Comment not found");
+            });
+        });
+      });
+      describe("DELETE", () => {
+        it("ERROR 204 returns correct status only", () => {
+          return request(app)
+            .delete("/api/comments/1")
+            .expect(204);
+        });
+        it("ERROR 400 if comment doesnt exist", () => {
+          return request(app)
+            .delete("/api/comments/11111111")
+            .expect(404);
         });
       });
     });
