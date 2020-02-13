@@ -100,7 +100,7 @@ describe("/api", () => {
       return Promise.all(promiseArray);
     });
     describe("GET", () => {
-      it("status 200, returns array of all article with default sorting", () => {
+      it("status 200, returns array of all articles with default sorting", () => {
         return request(app)
           .get("/api/articles/")
           .expect(200)
@@ -109,7 +109,7 @@ describe("/api", () => {
             expect(articles).to.be.sorted("created_at", { descending: true });
           });
       });
-      it("status 200, returns array of all article with author sorting", () => {
+      it("status 200, returns array of all articles with author sorting", () => {
         return request(app)
           .get("/api/articles/?author=butter_bridge")
           .expect(200)
@@ -118,13 +118,30 @@ describe("/api", () => {
             expect(articles).to.be.sorted("created_at", { descending: true });
           });
       });
-      it("status 200, returns array of all article with topic sorting", () => {
+      it("status 200, returns array of all articles with topic sorting", () => {
         return request(app)
           .get("/api/articles/?topic=mitch")
           .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles).to.have.length(11);
             expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
+      it("status 200, returns array of all articles with default sorting when given incorrect query", () => {
+        return request(app)
+          .get("/api/articles/?cheese=black")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(12);
+            expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
+      it("status 400, when given sort_by of a non existent column", () => {
+        return request(app)
+          .get("/api/articles/?sort_by=cheese")
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("Bad Request");
           });
       });
     });
@@ -342,7 +359,7 @@ describe("/api", () => {
             .delete("/api/comments/1")
             .expect(204);
         });
-        it("ERROR 400 if comment doesnt exist", () => {
+        it("ERROR 404 if comment doesnt exist", () => {
           return request(app)
             .delete("/api/comments/11111111")
             .expect(404);
