@@ -42,4 +42,19 @@ const updateArticle = (id, newVotes) => {
     });
 };
 
-module.exports = { fetchArticles, fetchArticleById, updateArticle };
+const checkArticle = ({ id }) => {
+  return query("articles")
+    .select("*")
+    .where({ article_id: id })
+    .then(([article]) => {
+      if (!article)
+        return Promise.reject({ status: 404, msg: "Article not found" });
+    });
+};
+
+module.exports = {
+  fetchArticles,
+  fetchArticleById,
+  updateArticle,
+  checkArticle
+};

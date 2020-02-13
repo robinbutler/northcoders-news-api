@@ -57,7 +57,7 @@ describe("/api", () => {
   describe("users", () => {
     describe("/:username", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-        const invalidMethods = ["delete", "post", "put"];
+        const invalidMethods = ["delete", "post", "patch"];
         const promiseArray = invalidMethods.map(method => {
           return request(app)
             [method]("/api/users/butter_bridge")
@@ -81,6 +81,14 @@ describe("/api", () => {
                 "avatar_url"
               );
               expect(response.body.user.username).to.equal("butter_bridge");
+            });
+        });
+        it("ERROR 404: responds with 404 and correct message on body", () => {
+          return request(app)
+            .get("/api/users/robin")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("User not found");
             });
         });
       });
@@ -125,6 +133,22 @@ describe("/api", () => {
           .then(({ body: { articles } }) => {
             expect(articles).to.have.length(11);
             expect(articles).to.be.sorted("created_at", { descending: true });
+          });
+      });
+      it("status 200, returns empty array for correct topic with no articles", () => {
+        return request(app)
+          .get("/api/articles/?topic=paper")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.eql([]);
+          });
+      });
+      it("status 200, returns empty array for correct author with no articles", () => {
+        return request(app)
+          .get("/api/articles/?author=lurker")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.eql([]);
           });
       });
       it("status 200, returns array of all articles with default sorting when given incorrect query", () => {
@@ -250,13 +274,13 @@ describe("/api", () => {
           it("ERROR 400 - correct path bad request", () => {
             return request(app)
               .post("/api/articles/not_an_id/comments")
-              .send({ username: "robin", body: "hello there" })
+              .send({ username: "butter_bridge", body: "hello there" })
               .expect(400)
               .then(response => {
                 expect(response.body.msg).to.equal("Bad Request");
               });
           });
-          it("ERROR 404/422 - correct path with non existent id", () => {
+          it("ERROR 422 - correct path with non existent id", () => {
             return request(app)
               .post("/api/articles/1/comments")
               .send({ username: "robin", body: "hello there" })
@@ -289,13 +313,28 @@ describe("/api", () => {
                 });
               });
           });
+          it("responds with a 200 and [] for correct article with no comments", () => {
+            return request(app)
+              .get("/api/articles/2/comments")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.eql([]);
+              });
+          });
           it("ERROR 400 - correct path bad request", () => {
             return request(app)
               .get("/api/articles/not_an_id/comments")
-              .send({ username: "robin", body: "hello there" })
               .expect(400)
               .then(response => {
                 expect(response.body.msg).to.equal("Bad Request");
+              });
+          });
+          it("ERROR 404 for non existent article", () => {
+            return request(app)
+              .get("/api/articles/999/comments")
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.eql("Article not found");
               });
           });
         });

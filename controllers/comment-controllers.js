@@ -4,6 +4,7 @@ const {
   updateCommentVotes,
   removeComment
 } = require("../models/comments-models");
+const { checkArticle } = require("../models/articles-models");
 
 const postComment = (req, res, next) => {
   articleId = req.params;
@@ -16,10 +17,10 @@ const postComment = (req, res, next) => {
 };
 
 const getComments = (req, res, next) => {
-  articleId = req.params;
+  article_id = req.params;
   userQuery = req.query;
-  fetchComments(articleId, userQuery)
-    .then(comments => {
+  Promise.all([fetchComments(article_id, userQuery), checkArticle(article_id)])
+    .then(([comments]) => {
       res.status(200).send({ comments });
     })
     .catch(next);
