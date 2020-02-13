@@ -6,6 +6,7 @@ const chaiSorted = require("chai-sorted");
 const { expect } = chai;
 const connection = require("../db/connection");
 chai.use(chaiSorted);
+chai.use(require("chai-json"));
 chai.use(require("sams-chai-sorted"));
 
 after(() => {
@@ -24,6 +25,28 @@ describe("/api", () => {
       .then(response => {
         expect(response.body.msg).to.equal("404 Route not found");
       });
+  });
+  it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+    const invalidMethods = ["patch", "post", "delete"];
+    const promiseArray = invalidMethods.map(method => {
+      return request(app)
+        [method]("/api/")
+        .expect(405)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("Invalid method");
+        });
+    });
+    return Promise.all(promiseArray);
+  });
+  describe("GET", () => {
+    it("200, returns correct status and json objects with all the endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(response => {
+          expect(response).to.be.a.jsonObj();
+        });
+    });
   });
   describe("/topics", () => {
     it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {

@@ -9,19 +9,151 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/users/:username": {
+    "description": "serves up a particular users details",
+    "queries": [],
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "Ninjiwarrior",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+          "name": "James"
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all topics",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": "1",
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": 1527695953341,
+          "comment_count": "5",
+          "votes": 50
+        },
+        {
+          "article_id": "2",
+          "title": "New pokemon game!",
+          "topic": "gaming",
+          "author": "Ninjiwarrior",
+          "body": "Text from the article..",
+          "created_at": 1527695953560,
+          "comment_count": "2",
+          "votes": 3
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves up a particular articles details",
+    "queries": [],
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": "1",
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": 1527695953341,
+          "comment_count": "5",
+          "votes": 50
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates a particular articles votes and returns updated article",
+    "queries": [],
+    "exampleInput": { "inc_votes": 5 },
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": "1",
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": 1527695953341,
+          "comment_count": "5",
+          "votes": 55
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment from a verified user on a verified article",
+    "queries": [],
+    "exampleInput": {
+      "username": "weegembump",
+      "body": "Text from the comment.."
+    },
+    "exampleResponse": {
+      "comment": [
+        {
+          "author": "weegembump",
+          "comment_id": "1",
+          "body": "Text from the comment..",
+          "created_at": 1527695953341,
+          "article_id": "2",
+          "votes": 7
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments?query": {
+    "description": "retrieves all comments from a particular article",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "author": "weegembump",
+          "comment_id": "1",
+          "body": "Text from the comment..",
+          "created_at": 1527695953341,
+          "article_id": "2",
+          "votes": 7
+        },
+        {
+          "author": "Ninjiwarrior",
+          "comment_id": "2",
+          "body": "Text from the comment..",
+          "created_at": 1527695957000,
+          "article_id": "2",
+          "votes": 3
+        }
+      ]
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates a particular comments votes based on ID",
+    "queries": [],
+    "exampleInput": {
+      "inc_votes": "1"
+    },
+    "exampleResponse": {
+      "comment": [
+        {
+          "author": "weegembump",
+          "comment_id": "1",
+          "body": "Text from the comment..",
+          "created_at": 1527695953341,
+          "article_id": "2",
+          "votes": 8
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "removes a particular comments votes based on ID",
+    "queries": [],
+    "exampleInput": "NaN",
+    "exampleResponse": "NaN"
   }
 }
