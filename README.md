@@ -87,9 +87,9 @@ This allows heroku to use the dev data when displaying information, but testing 
 Linux users will have to provide postgress with a username and password to access the data this can be done by typing the following into the command terminal
 
 ```bash
-/northcoders-news-api$ export = PGUSERNAME='your username here'
+/northcoders-news-api$ export PGUSERNAME='your username here'
 
-/northcoders-news-api$ export = PGPASSWORD='your password here'
+/northcoders-news-api$ export PGPASSWORD='your password here'
 
 /northcoders-news-api$ clear
 ```
