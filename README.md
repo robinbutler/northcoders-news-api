@@ -82,6 +82,20 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 This allows heroku to use the dev data when displaying information, but testing will be run on the test data instead.
 
+#### Linux users
+
+Linux users will have to provide postgress with a username and password to access the data this can be done by typing the following into the command terminal
+
+```bash
+/northcoders-news-api$ export = PGUSERNAME='your username here'
+
+/northcoders-news-api$ export = PGPASSWORD='your password here'
+
+/northcoders-news-api$ clear
+```
+
+This adds your credentials to the command terminal for as long as it stays open and prevents you from accidentally added them to your github repo
+
 ### Step 3 - Installing dependencies and setting up
 
 While in northcoders-news-api run npm install to install all programs necassary for running and accessing the server
