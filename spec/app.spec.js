@@ -240,7 +240,7 @@ describe("/api", () => {
           return request(app)
             .patch("/api/articles/5")
             .send({ inc_votes: 5 })
-            .expect(201)
+            .expect(200)
             .then(response => {
               expect(response.body.article.votes).to.equal(5);
             });
@@ -284,7 +284,7 @@ describe("/api", () => {
               .send({ username: "butter_bridge", body: "hello there" })
               .expect(201)
               .then(response => {
-                expect(response.body.addedComment).to.contain.keys(
+                expect(response.body.comment).to.contain.keys(
                   "author",
                   "body",
                   "comment_id",
@@ -383,7 +383,7 @@ describe("/api", () => {
           return request(app)
             .patch("/api/comments/1")
             .send({ inc_votes: -5 })
-            .expect(201)
+            .expect(200)
             .then(({ body: { comment } }) => {
               expect(comment.votes).to.equal(11);
               expect(comment).to.contain.keys(

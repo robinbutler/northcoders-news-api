@@ -7,18 +7,18 @@ const {
 const { checkArticle } = require("../models/articles-models");
 
 const postComment = (req, res, next) => {
-  articleId = req.params;
-  newComment = req.body;
+  const articleId = req.params;
+  const newComment = req.body;
   addComment(articleId, newComment)
-    .then(addedComment => {
-      res.status(201).send({ addedComment });
+    .then(comment => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };
 
 const getComments = (req, res, next) => {
-  article_id = req.params;
-  userQuery = req.query;
+  const article_id = req.params;
+  const userQuery = req.query;
   Promise.all([fetchComments(article_id, userQuery), checkArticle(article_id)])
     .then(([comments]) => {
       res.status(200).send({ comments });
@@ -27,20 +27,20 @@ const getComments = (req, res, next) => {
 };
 
 const patchComment = (req, res, next) => {
-  commentId = req.params;
-  newVotes = req.body;
+  const commentId = req.params;
+  const newVotes = req.body;
   updateCommentVotes(commentId, newVotes)
     .then(comment => {
-      res.status(201).send({ comment });
+      res.status(200).send({ comment });
     })
     .catch(next);
 };
 
 const deleteComment = (req, res, next) => {
-  commentId = req.params;
+  const commentId = req.params;
   removeComment(commentId)
-    .then(deletion => {
-      return res.sendStatus(204);
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch(next);
 };

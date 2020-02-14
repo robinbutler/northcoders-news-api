@@ -1,17 +1,15 @@
 exports.formatDates = list => {
-  return [
-    ...list.map(article => {
-      let articleCopy = { ...article };
-      articleCopy.created_at = new Date(articleCopy["created_at"] * 1000);
-      return articleCopy;
-    })
-  ];
+  return list.map(article => {
+    const articleCopy = { ...article };
+    articleCopy.created_at = new Date(articleCopy["created_at"]);
+    return articleCopy;
+  });
 };
 
 exports.makeRefObj = list => {
   const ref = {};
   list.forEach(article => {
-    articleCopy = { ...article };
+    const articleCopy = { ...article };
     const lookup = articleCopy["title"];
     const value = articleCopy["article_id"];
     ref[lookup] = value;
@@ -21,7 +19,7 @@ exports.makeRefObj = list => {
 
 exports.formatComments = (comments, articleRef) => {
   return comments.map(comment => {
-    commentCopy = { ...comment };
+    const commentCopy = { ...comment };
     const article = commentCopy["belongs_to"];
     commentCopy.article_id = articleRef[article];
     commentCopy.author = commentCopy["created_by"];

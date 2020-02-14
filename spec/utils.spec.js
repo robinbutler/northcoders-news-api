@@ -11,6 +11,29 @@ describe("Format Dates", () => {
     expect(formatDates(input)).to.not.equal(input);
     expect(formatDates(input)).to.eql([]);
   });
+  it("input is not mutated", () => {
+    const input = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ];
+    formatDates(input);
+    expect(input).to.eql([
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ]);
+  });
   it("can change the time of a single object", () => {
     const input = [
       {
@@ -104,6 +127,32 @@ describe("formatComments", () => {
     const input = [];
     expect(formatComments(input)).to.not.equal(input);
     expect(formatComments(input)).to.eql([]);
+  });
+  it("doesnt mutate input", () => {
+    const input = [
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389
+      }
+    ];
+    const articleRef = {
+      "Living in the shadow of a great man": 1
+    };
+    formatComments(input, articleRef);
+    expect(input).to.eql([
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389
+      }
+    ]);
   });
   it("single object with correct key value pairs", () => {
     const comments = [

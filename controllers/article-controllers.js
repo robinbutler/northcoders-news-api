@@ -5,7 +5,7 @@ const {
 } = require("../models/articles-models");
 
 const getArticles = (req, res, next) => {
-  userQuery = req.query;
+  const userQuery = req.query;
   fetchArticles(userQuery)
     .then(articles => {
       res.status(200).send({ articles });
@@ -14,7 +14,7 @@ const getArticles = (req, res, next) => {
 };
 
 const getArticleById = (req, res, next) => {
-  id = req.params["id"];
+  const id = req.params.id;
   fetchArticleById(id)
     .then(article => {
       res.status(200).send({ article });
@@ -23,11 +23,11 @@ const getArticleById = (req, res, next) => {
 };
 
 const patchArticle = (req, res, next) => {
-  newVote = req.body.inc_votes;
-  id = req.params.id;
+  const newVote = req.body.inc_votes;
+  const id = req.params.id;
   updateArticle(id, newVote)
     .then(article => {
-      res.status(201).send({ article });
+      res.status(200).send({ article });
     })
     .catch(next);
 };

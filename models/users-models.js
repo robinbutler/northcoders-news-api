@@ -2,7 +2,7 @@ const query = require("../db/connection");
 
 const fetchUser = account => {
   return query
-    .select("username", "name", "avatar_url")
+    .select("*")
     .from("users")
     .where({ username: `${account}` })
     .then(user => {

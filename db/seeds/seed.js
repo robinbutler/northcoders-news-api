@@ -15,21 +15,21 @@ exports.seed = function(knex) {
       const topicsInsertions = knex("topics").insert(topicData);
       const usersInsertions = knex("users").insert(userData);
 
-      return Promise.all([topicsInsertions, usersInsertions])
-        .then(() => {
-          return knex("articles")
-            .insert(formatDates(articleData))
-            .returning("*");
-        })
-        .then(articleRows => {
-          const articleRef = makeRefObj(articleRows);
-          let dateFormattedComments = formatDates(commentData);
+      return Promise.all([topicsInsertions, usersInsertions]);
+    })
+    .then(() => {
+      return knex("articles")
+        .insert(formatDates(articleData))
+        .returning("*");
+    })
+    .then(articleRows => {
+      const articleRef = makeRefObj(articleRows);
+      const dateFormattedComments = formatDates(commentData);
 
-          const formattedComments = formatComments(
-            dateFormattedComments,
-            articleRef
-          );
-          return knex("comments").insert(formattedComments);
-        });
+      const formattedComments = formatComments(
+        dateFormattedComments,
+        articleRef
+      );
+      return knex("comments").insert(formattedComments);
     });
 };

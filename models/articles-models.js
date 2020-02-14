@@ -2,15 +2,15 @@ const query = require("../db/connection");
 
 const fetchArticles = ({ sort_by, order, author, topic }) => {
   return query("articles")
-    .select("*")
+    .select("articles.*")
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .count("comment_id as comment_count")
+    .groupBy("articles.article_id")
     .modify(query => {
-      if (author) query.where({ author });
+      if (author) query.where({ "articles.author": author });
       if (topic) query.where({ topic });
     })
-    .orderBy(sort_by || "created_at", order || "desc")
-    .then(articles => {
-      return articles;
-    });
+    .orderBy(sort_by || "created_at", order || "desc");
 };
 
 const fetchArticleById = id => {
@@ -27,7 +27,7 @@ const fetchArticleById = id => {
     });
 };
 
-const updateArticle = (id, newVotes) => {
+const updateArticle = (id, newVotes = 0) => {
   return query("articles")
     .increment("votes", newVotes)
     .returning("*")

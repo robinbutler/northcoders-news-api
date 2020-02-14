@@ -4,10 +4,7 @@ const fetchTopics = () => {
   return query
     .select("*")
     .from("topics")
-    .orderBy("slug")
-    .then(topics => {
-      return { topics };
-    });
+    .orderBy("slug");
 };
 
 module.exports = fetchTopics;
