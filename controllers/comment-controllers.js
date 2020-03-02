@@ -2,7 +2,8 @@ const {
   addComment,
   fetchComments,
   updateCommentVotes,
-  removeComment
+  removeComment,
+  fetchUserComments
 } = require("../models/comments-models");
 const { checkArticle } = require("../models/articles-models");
 
@@ -45,4 +46,19 @@ const deleteComment = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { postComment, getComments, patchComment, deleteComment };
+const getUserComments = (req, res, next) => {
+  const { comments } = req.params;
+  fetchUserComments(comments)
+    .then(userComments => {
+      res.status(200).send({ userComments });
+    })
+    .catch(next);
+};
+
+module.exports = {
+  postComment,
+  getComments,
+  patchComment,
+  deleteComment,
+  getUserComments
+};

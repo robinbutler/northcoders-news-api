@@ -7,4 +7,13 @@ const fetchTopics = () => {
     .orderBy("slug");
 };
 
-module.exports = fetchTopics;
+const addTopic = topic => {
+  return query("topics")
+    .insert(topic)
+    .returning("*")
+    .then(topic => {
+      return topic[0];
+    });
+};
+
+module.exports = { fetchTopics, addTopic };

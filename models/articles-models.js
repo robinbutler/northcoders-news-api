@@ -1,6 +1,6 @@
 const query = require("../db/connection");
 
-const fetchArticles = ({ sort_by, order, author, topic }) => {
+const fetchArticles = ({ sort_by, order, author, topic, p = 1, limit }) => {
   return query("articles")
     .select("articles.*")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
@@ -9,6 +9,7 @@ const fetchArticles = ({ sort_by, order, author, topic }) => {
     .modify(query => {
       if (author) query.where({ "articles.author": author });
       if (topic) query.where({ topic });
+      if (limit) query.limit(limit).offset(p - 1);
     })
     .orderBy(sort_by || "created_at", order || "desc");
 };
@@ -52,9 +53,38 @@ const checkArticle = ({ id }) => {
     });
 };
 
+const addNewArticle = article => {
+  return query("articles")
+    .insert(article)
+    .returning("*");
+};
+
+const removeArticle = article_id => {
+  return query("articles")
+    .where({ article_id })
+    .del()
+    .then(deleteCount => {
+      if (deleteCount === 0)
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+    });
+};
+
+const fetchUserArticles = username => {
+  return query("articles")
+    .where({ author: username })
+    .orderBy("created_at", "desc")
+    .then(articles => {
+      console.log(articles);
+      return articles[0];
+    });
+};
+
 module.exports = {
   fetchArticles,
   fetchArticleById,
   updateArticle,
-  checkArticle
+  checkArticle,
+  addNewArticle,
+  removeArticle,
+  fetchUserArticles
 };

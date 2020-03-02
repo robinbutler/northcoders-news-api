@@ -12,11 +12,14 @@ const addComment = (article_id, comment) => {
     });
 };
 
-const fetchComments = ({ id }, { sort_by, order }) => {
+const fetchComments = ({ id }, { sort_by, order, limit, p = 1 }) => {
   return query("comments")
     .select("*")
     .where({ article_id: id })
     .orderBy(sort_by || "created_at", order || "desc")
+    .modify(query => {
+      if (limit) query.limit(limit).offset(p - 1);
+    })
     .then(comments => {
       return comments;
     });
@@ -44,9 +47,19 @@ const removeComment = ({ comment_id }) => {
     });
 };
 
+const fetchUserComments = username => {
+  return query("comments")
+    .where({ author: username })
+    .orderBy("created_at", "desc")
+    .then(comments => {
+      return comments[0];
+    });
+};
+
 module.exports = {
   addComment,
   fetchComments,
   updateCommentVotes,
-  removeComment
+  removeComment,
+  fetchUserComments
 };

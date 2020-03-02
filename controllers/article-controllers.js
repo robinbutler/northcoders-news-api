@@ -1,7 +1,10 @@
 const {
   fetchArticles,
   fetchArticleById,
-  updateArticle
+  updateArticle,
+  addNewArticle,
+  removeArticle,
+  fetchUserArticles
 } = require("../models/articles-models");
 
 const getArticles = (req, res, next) => {
@@ -32,4 +35,39 @@ const patchArticle = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getArticleById, patchArticle, getArticles };
+const postArticle = (req, res, next) => {
+  const newArticle = req.body;
+  addNewArticle(newArticle)
+    .then(article => {
+      article = article[0];
+      res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+const deleteArticle = (req, res, next) => {
+  const { id } = req.params;
+  removeArticle(id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
+};
+
+const getUserArticles = (req, res, next) => {
+  const { username } = req.params;
+  fetchUserArticles(username)
+    .then(userArticles => {
+      res.status(200).send({ userArticles });
+    })
+    .catch(next);
+};
+
+module.exports = {
+  getArticleById,
+  patchArticle,
+  getArticles,
+  postArticle,
+  deleteArticle,
+  getUserArticles
+};

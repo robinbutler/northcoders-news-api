@@ -26,7 +26,7 @@ describe("/api", () => {
         expect(response.body.msg).to.equal("404 Route not found");
       });
   });
-  it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
+  it("ERROR 405 INVALID METHOD, returns status 405 with msg  invalid method", () => {
     const invalidMethods = ["patch", "post", "delete"];
     const promiseArray = invalidMethods.map(method => {
       return request(app)
@@ -50,7 +50,7 @@ describe("/api", () => {
   });
   describe("/topics", () => {
     it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-      const invalidMethods = ["patch", "post", "delete"];
+      const invalidMethods = ["patch", "delete"];
       const promiseArray = invalidMethods.map(method => {
         return request(app)
           [method]("/api/topics")
@@ -76,8 +76,29 @@ describe("/api", () => {
           });
       });
     });
+    describe.only("POST", () => {
+      it("201 responds with posted topic", () => {
+        return request(app)
+          .post("/api/topics")
+          .send({ description: "chess is cool", slug: "CHESS BOIS" })
+          .expect(201)
+          .then(({ body: { topic } }) => {
+            expect(topic).to.be.an("object");
+            expect(topic).to.contain.keys("description", "slug");
+          });
+      });
+      it("ERROR 400 for missing data - slug", () => {
+        return request(app)
+          .post("/api/topics")
+          .send({ description: "chess is cool" })
+          .expect(400);
+      });
+    });
   });
   describe("users", () => {
+    describe("POST", () => {
+      it("200 responds with correct status code list of all users");
+    });
     describe("/:username", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
         const invalidMethods = ["delete", "post", "patch"];
@@ -116,10 +137,17 @@ describe("/api", () => {
         });
       });
     });
+    describe.only("/articles", () => {
+      it("status 200", () => {
+        return request(app)
+          .get("/api/users/butter_bridge/articles/")
+          .expect(200);
+      });
+    });
   });
   describe("/articles", () => {
     it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-      const invalidMethods = ["patch", "delete", "post"];
+      const invalidMethods = ["patch", "delete"];
       const promiseArray = invalidMethods.map(method => {
         return request(app)
           [method]("/api/articles/")
@@ -192,9 +220,59 @@ describe("/api", () => {
           });
       });
     });
+    describe("POST", () => {
+      it("201 sucessful post responds with 201 and the posted article", () => {
+        return request(app)
+          .post("/api/articles")
+          .send({
+            title: "A new article",
+            body: "Something to talk about",
+            topic: "mitch",
+            author: "icellusedkars"
+          })
+          .expect(201)
+          .then(({ body: { article } }) => {
+            expect(article).to.have.keys(
+              "article_id",
+              "title",
+              "body",
+              "votes",
+              "topic",
+              "author",
+              "created_at"
+            );
+          });
+      });
+      it("400 returns correct status when given invalid data - missing not nullable column", () => {
+        return request(app)
+          .post("/api/articles")
+          .send({
+            body: "Something to talk about",
+            author: "icellusedkars"
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad Request");
+          });
+      });
+      it("422 returns correct status for unprocessable entity", () => {
+        return request(app)
+          .post("/api/articles")
+          .send({
+            title: "A new article",
+            body: "Something to talk about",
+            topic: "mitch",
+            author: "not an author"
+          })
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Unprocessable input");
+          });
+      });
+    });
     describe("/:id", () => {
       it("ERROR 405 INVALID METHOD, returns status 405 with msg invalid method", () => {
-        const invalidMethods = ["delete", "post"];
+        const invalidMethods = ["post"];
         const promiseArray = invalidMethods.map(method => {
           return request(app)
             [method]("/api/articles/1")
@@ -262,6 +340,23 @@ describe("/api", () => {
             .then(response => {
               expect(response.body.msg).to.equal("User not found");
             });
+        });
+      });
+      describe("DELETE", () => {
+        it("204 returns correct status and no body", () => {
+          return request(app)
+            .delete("/api/articles/1")
+            .expect(204);
+        });
+        it("ERROR 400 returns 400 for invalid article id", () => {
+          return request(app)
+            .delete("/api/articles/dog")
+            .expect(400);
+        });
+        it("ERROR 404 returns 404 for non existent article id", () => {
+          return request(app)
+            .delete("/api/articles/9000")
+            .expect(404);
         });
       });
       describe("/comments", () => {

@@ -12,4 +12,12 @@ const fetchUser = account => {
     });
 };
 
-module.exports = fetchUser;
+const addUser = user => {
+  return query("topics")
+    .insert(user)
+    .returning("*")
+    .then(user => {
+      return user[0];
+    });
+};
+module.exports = { fetchUser, addUser };
