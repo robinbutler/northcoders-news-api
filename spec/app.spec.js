@@ -137,10 +137,17 @@ describe("/api", () => {
         });
       });
     });
-    describe.only("/articles", () => {
+    describe("/articles", () => {
       it("status 200", () => {
         return request(app)
           .get("/api/users/butter_bridge/articles/")
+          .expect(200);
+      });
+    });
+    describe.only("/comments", () => {
+      it("status 200", () => {
+        return request(app)
+          .get("/api/users/butter_bridge/comments/")
           .expect(200);
       });
     });

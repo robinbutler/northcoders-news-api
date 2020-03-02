@@ -49,7 +49,7 @@ const removeComment = ({ comment_id }) => {
 
 const fetchUserComments = username => {
   return query("comments")
-    .where({ created_by: username })
+    .where({ author: username })
     .orderBy("created_at", "desc")
     .then(comments => {
       return comments[0];

@@ -47,8 +47,8 @@ const deleteComment = (req, res, next) => {
 };
 
 const getUserComments = (req, res, next) => {
-  const { comments } = req.params;
-  fetchUserComments(comments)
+  const { username } = req.params;
+  fetchUserComments(username)
     .then(userComments => {
       res.status(200).send({ userComments });
     })
