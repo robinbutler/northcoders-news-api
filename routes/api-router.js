@@ -6,9 +6,6 @@ const articleRouter = require("./article-router");
 const commentRouter = require("./comment-router");
 const handle405errors = require("../errors/405s");
 const getEndpoints = require("../controllers/api-controller");
-const cors = require("cors");
-
-app.use(cors());
 
 apiRouter
   .route("/")

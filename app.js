@@ -6,6 +6,10 @@ const handle404errors = require("./errors/404s");
 const handle422errors = require("./errors/422s");
 const handle500errors = require("./errors/500s");
 
+const cors = require("cors");
+
+app.use(cors());
+
 app.use(express.json());
 
 app.use("/api", apiRouter);
