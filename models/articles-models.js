@@ -1,6 +1,6 @@
 const query = require("../db/connection");
 
-const fetchArticles = ({ sort_by, order, author, topic, p = 1, limit }) => {
+const fetchArticles = ({ sort_by, order, author, topic, p = 1, limit = 5 }) => {
   return query("articles")
     .select("articles.*")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
